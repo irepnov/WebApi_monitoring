@@ -13,6 +13,7 @@ using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Middleware.HealthCheck;
+using Middleware.Logging;
 
 namespace RFCManager
 {
@@ -29,7 +30,9 @@ namespace RFCManager
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddCustomMVC(Configuration)
-                    .AddCustomHealthCheck(Configuration);
+                    .AddCustomHealthCheck(Configuration)
+                    .AddLogging(builder => builder.AddConsole())
+                    .AddRequestLogging();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -43,6 +46,8 @@ namespace RFCManager
             app.UseRouting();
 
             app.UseAuthorization();
+
+            app.UseRequestLogging("liveness");
 
             app.UseEndpoints(endpoints =>
             {

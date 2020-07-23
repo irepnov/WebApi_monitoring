@@ -13,6 +13,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Middleware.Logging;
 
 namespace WebService
 {
@@ -38,7 +39,9 @@ namespace WebService
                     }, 
                     name: "disc", failureStatus: HealthStatus.Unhealthy);
             //adding health check UI services
-            services.AddHealthChecksUI().AddInMemoryStorage(); ;
+            services.AddHealthChecksUI().AddInMemoryStorage();
+            services.AddLogging(builder => builder.AddConsole());
+            services.AddRequestLogging();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -52,6 +55,7 @@ namespace WebService
             app.UseRouting();
 
             app.UseAuthorization();
+            app.UseRequestLogging("hc-ui");
 
             app.UseEndpoints(endpoints =>
             {
@@ -71,6 +75,8 @@ namespace WebService
                 option.UIPath = "/hc-ui";
                 option.AddCustomStylesheet("custom.css");
             });
+
+            
         }
     }
 }
